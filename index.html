@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangla Vintage Radio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #8e44ad;
+            --secondary-color: #9b59b6;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --vintage-brown: #5d4037;
+            --vintage-gold: #d4af37;
+            --vintage-cream: #f5e8d0;
+            --vintage-metal: #c0c0c0;
+            --vintage-wood: #8B4513;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #222;
+            color: #333;
+            background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        .radio-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: linear-gradient(135deg, #3a3226, #2a241b);
+            border-radius: 15px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 12px solid var(--vintage-wood);
+            position: relative;
+            padding: 5px;
+        }
+        
+        .wood-grain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .radio-header {
+            background: linear-gradient(135deg, #3a3226, #2a241b);
+            color: var(--vintage-gold);
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--vintage-gold);
+            position: relative;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-family: 'Times New Roman', serif;
+            letter-spacing: 1px;
+        }
+        
+        .radio-header h1 {
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin: 0;
+            font-size: 2rem;
+            text-transform: uppercase;
+        }
+        
+        .radio-header p {
+            margin: 5px 0 0;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        .radio-body {
+            padding: 20px;
+            position: relative;
+        }
+        
+        .station-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: rgba(30, 25, 20, 0.7);
+            border-radius: 8px;
+            border: 2px solid var(--vintage-brown);
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        .station-item {
+            background-color: rgba(50, 40, 35, 0.8);
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .station-item:hover {
+            background-color: rgba(70, 60, 55, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .station-item.active {
+            background-color: rgba(142, 68, 173, 0.3);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .station-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+            border: 2px solid var(--vintage-brown);
+            background-color: #000;
+            padding: 2px;
+        }
+        
+        .station-info {
+            flex-grow: 1;
+        }
+        
+        .station-name {
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: var(--vintage-gold);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .station-frequency {
+            font-size: 0.75rem;
+            color: #aaa;
+            font-style: italic;
+        }
+        
+        .player-controls {
+            background: linear-gradient(to bottom, #3a3226, #2a241b);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.3),
+                inset 0 0 10px rgba(0,0,0,0.5);
+            border: 2px solid var(--vintage-brown);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .player-controls::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/brushed-alum.png');
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        .player-display {
+            background-color: #1a1612;
+            border: 3px solid #444;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-family: 'Digital', monospace;
+            font-size: 1.2rem;
+            color: var(--vintage-gold);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+        }
+        
+        .player-display::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), transparent);
+        }
+        
+        .current-station {
+            font-weight: bold;
+            color: var(--vintage-gold);
+            letter-spacing: 1px;
+        }
+        
+        .current-song {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .analog-btn {
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle at 30% 30%, #555, #222);
+            color: var(--vintage-gold);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 5px 15px rgba(0, 0, 0, 0.4),
+                inset 0 -5px 15px rgba(0,0,0,0.5),
+                inset 0 5px 10px rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            border: 2px solid #444;
+        }
+        
+        .analog-btn::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .analog-btn:active {
+            transform: translateY(2px);
+            box-shadow: 
+                0 2px 5px rgba(0, 0, 0, 0.3),
+                inset 0 -3px 10px rgba(0,0,0,0.5),
+                inset 0 3px 10px rgba(255,255,255,0.1);
+        }
+        
+        .analog-btn:hover {
+            color: #f0d070;
+        }
+        
+        .btn-play {
+            width: 80px;
+            height: 80px;
+            font-size: 1.8rem;
+            background: radial-gradient(circle at 30% 30%, #666, #333);
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .volume-icon {
+            color: var(--vintage-gold);
+            font-size: 1.2rem;
+            text-shadow: 0 0 3px rgba(212, 175, 55, 0.5);
+        }
+        
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 5px;
+            border: 1px solid #444;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--vintage-gold);
+            cursor: pointer;
+            border: 2px solid #444;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        .knob-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+        }
+        
+        .knob {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at 30% 30%, var(--vintage-metal), #999);
+            border-radius: 50%;
+            border: 3px solid #555;
+            position: relative;
+            box-shadow: 
+                0 5px 10px rgba(0, 0, 0, 0.3),
+                inset 0 -5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .knob::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--vintage-gold);
+            border-radius: 50%;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+        }
+        
+        .knob-label {
+            text-align: center;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            color: var(--vintage-gold);
+            font-weight: bold;
+            text-shadow: 0 0 3px rgba(212, 175, 55, 0.3);
+            letter-spacing: 0.5px;
+        }
+        
+        .radio-dial {
+            height: 10px;
+            background: linear-gradient(to right, #6e1a1a, #1a356e);
+            margin: 25px 0;
+            border-radius: 5px;
+            position: relative;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+        
+        .dial-pointer {
+            width: 3px;
+            height: 15px;
+            background-color: var(--vintage-gold);
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--vintage-brown);
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+        
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--vintage-gold);
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-style: solid;
+            border-color: var(--vintage-gold);
+            border-width: 0;
+            z-index: 2;
+        }
+        
+        .corner-tl {
+            top: 0;
+            left: 0;
+            border-top-width: 3px;
+            border-left-width: 3px;
+            border-top-left-radius: 5px;
+        }
+        
+        .corner-tr {
+            top: 0;
+            right: 0;
+            border-top-width: 3px;
+            border-right-width: 3px;
+            border-top-right-radius: 5px;
+        }
+        
+        .corner-bl {
+            bottom: 0;
+            left: 0;
+            border-bottom-width: 3px;
+            border-left-width: 3px;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .corner-br {
+            bottom: 0;
+            right: 0;
+            border-bottom-width: 3px;
+            border-right-width: 3px;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .speaker {
+            height: 80px;
+            background: linear-gradient(to bottom, #2a241b, #1a1612);
+            border-radius: 5px;
+            margin: 25px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            border: 1px solid #444;
+        }
+        
+        .speaker::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(to right, rgba(0,0,0,0.2) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.2) 1px, transparent 1px);
+            background-size: 15px 15px;
+        }
+        
+        .radio-container::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="radio-container">
+        <div class="wood-grain"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+        
+        <div class="radio-header">
+            <h1>VINTAGE RADIO</h1>
+            <p>Est. 1971 • বাংলাদেশের সমস্ত রেডিও স্টেশন</p>
+        </div>
+        
+        <div class="radio-body">
+            <div class="station-list" id="stationList">
+                <!-- Stations will be added here by JavaScript -->
+            </div>
+            
+            <div class="player-controls">
+                <div class="speaker"></div>
+                
+                <div class="player-display">
+                    <div id="playerInfo">
+                        <div class="current-station">Select a station</div>
+                        <div class="current-song" id="currentSong"></div>
+                        <div id="loadingSpinner" class="spinner"></div>
+                    </div>
+                </div>
+                
+                <div class="radio-dial">
+                    <div class="dial-pointer"></div>
+                </div>
+                
+                <div class="control-buttons">
+                    <button class="analog-btn" id="btnPrev">
+                        <i class="fas fa-backward"></i>
+                    </button>
+                    <button class="analog-btn btn-play" id="btnPlay">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="analog-btn" id="btnNext">
+                        <i class="fas fa-forward"></i>
+                    </button>
+                </div>
+                
+                <div class="volume-control">
+                    <i class="fas fa-volume-down volume-icon"></i>
+                    <input type="range" class="volume-slider" id="volumeControl" min="0" max="1" step="0.1" value="0.7">
+                    <i class="fas fa-volume-up volume-icon"></i>
+                </div>
+                
+                <div class="knob-container">
+                    <div>
+                        <div class="knob"></div>
+                        <div class="knob-label">TUNING</div>
+                    </div>
+                    <div>
+                        <div class="knob"></div>
+                        <div class="knob-label">BASS</div>
+                    </div>
+                    <div>
+                        <div class="knob"></div>
+                        <div class="knob-label">TREBLE</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Bangladeshi radio stations with verified working streams
+        const radioStations = [
+            {
+                name: "Bangladesh Betar",
+                frequency: "FM 88.8",
+                streamUrl: "https://as1.digitalsynapsebd.com/proxy/bbdkka/stream",
+                logo: "https://cdn.instant.audio/images/logos/radio-bd-com/bangladesh-betar-am.png",
+                category: "Government"
+            },
+            {
+                name: "Radio Today",
+                frequency: "FM 89.6",
+                streamUrl: "https://stream-140.zeno.fm/0zha3rfq02quv",
+                logo: "https://cdn.instant.audio/images/logos/radio-bd-com/today.png",
+                category: "News"
+            },
+            {
+                name: "Radio Foorti",
+                frequency: "FM 88.0",
+                streamUrl: "https://stream-174.zeno.fm/cwa3vg8s8druv",
+                logo: "https://cdn.instant.audio/images/logos/radio-bd-com/foorti.png",
+                category: "Music"
+            },
+            {
+                name: "Radio Shadhin",
+                frequency: "FM 92.4",
+                streamUrl: "https://stream-156.zeno.fm/eabgu655puquv",
+                logo: "https://cdn.instant.audio/images/logos/radio-bd-com/shadhin.png",
+                category: "Music"
+            },
+            {
+                name: "Radio Capital",
+                frequency: "FM 94.8",
+                streamUrl: "http://str.radiocapital.fm:8000/stream",
+                logo: "https://cdn.instant.audio/images/logos/radio-bd-com/capital.png",
+                category: "Business"
+            },
+            {
+                name: "Roots Air",
+                frequency: "Online",
+                streamUrl: "http://live64.zeilsteen.com:7054/;",
+                logo: "https://cdn.instant.audio/images/logos/radio-bd-com/roots-air.png",
+                category: "Music"
+            }
+        ];
+
+        // DOM elements
+        const stationList = document.getElementById('stationList');
+        const btnPlay = document.getElementById('btnPlay');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const volumeControl = document.getElementById('volumeControl');
+        const playerInfo = document.getElementById('playerInfo');
+        const currentSong = document.getElementById('currentSong');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // Audio context
+        let audio = new Audio();
+        audio.volume = 0.7;
+        let currentStationIndex = -1;
+        let isPlaying = false;
+
+        // Initialize the app
+        function init() {
+            renderStationList();
+            setupEventListeners();
+        }
+
+        // Render station list
+        function renderStationList() {
+            stationList.innerHTML = '';
+            
+            radioStations.forEach((station, index) => {
+                const stationItem = document.createElement('div');
+                stationItem.className = 'station-item';
+                stationItem.innerHTML = `
+                    <img src="${station.logo}" alt="${station.name}" class="station-logo" onerror="this.src='https://via.placeholder.com/40?text=Radio'">
+                    <div class="station-info">
+                        <div class="station-name">${station.name}</div>
+                        <div class="station-frequency">${station.frequency}</div>
+                    </div>
+                `;
+                
+                stationItem.addEventListener('click', () => {
+                    selectStation(index);
+                });
+                
+                stationList.appendChild(stationItem);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            btnPlay.addEventListener('click', togglePlay);
+            btnPrev.addEventListener('click', playPrevious);
+            btnNext.addEventListener('click', playNext);
+            volumeControl.addEventListener('input', setVolume);
+            
+            audio.addEventListener('play', () => {
+                isPlaying = true;
+                btnPlay.innerHTML = '<i class="fas fa-pause"></i>';
+                updateActiveStation();
+            });
+            
+            audio.addEventListener('pause', () => {
+                isPlaying = false;
+                btnPlay.innerHTML = '<i class="fas fa-play"></i>';
+                updateActiveStation();
+            });
+            
+            audio.addEventListener('error', () => {
+                loadingSpinner.style.display = 'none';
+                currentSong.textContent = 'Error loading station';
+            });
+            
+            audio.addEventListener('waiting', () => {
+                loadingSpinner.style.display = 'inline-block';
+                currentSong.textContent = 'Buffering...';
+            });
+            
+            audio.addEventListener('playing', () => {
+                loadingSpinner.style.display = 'none';
+                currentSong.textContent = 'Now playing...';
+            });
+        }
+
+        // Select station
+        function selectStation(index) {
+            if (currentStationIndex === index && isPlaying) return;
+            
+            const station = radioStations[index];
+            
+            // Update UI
+            playerInfo.querySelector('.current-station').textContent = `${station.name} (${station.frequency})`;
+            currentSong.textContent = 'Connecting...';
+            loadingSpinner.style.display = 'inline-block';
+            
+            // Stop current audio if playing
+            if (isPlaying) {
+                audio.pause();
+            }
+            
+            // Set new audio source
+            audio.src = station.streamUrl;
+            audio.load();
+            
+            // Play the station
+            audio.play()
+                .then(() => {
+                    currentStationIndex = index;
+                    isPlaying = true;
+                })
+                .catch(error => {
+                    console.error('Error playing station:', error);
+                    currentSong.textContent = 'Error: Could not play station';
+                    loadingSpinner.style.display = 'none';
+                });
+        }
+
+        // Update active station
+        function updateActiveStation() {
+            const items = stationList.querySelectorAll('.station-item');
+            items.forEach((item, index) => {
+                item.classList.toggle('active', index === currentStationIndex);
+            });
+        }
+
+        // Toggle play/pause
+        function togglePlay() {
+            if (currentStationIndex === -1) {
+                if (radioStations.length > 0) {
+                    selectStation(0);
+                }
+                return;
+            }
+            
+            if (isPlaying) {
+                audio.pause();
+            } else {
+                audio.play();
+            }
+        }
+
+        // Play previous station
+        function playPrevious() {
+            if (radioStations.length === 0) return;
+            
+            let newIndex = currentStationIndex - 1;
+            if (newIndex < 0) newIndex = radioStations.length - 1;
+            selectStation(newIndex);
+        }
+
+        // Play next station
+        function playNext() {
+            if (radioStations.length === 0) return;
+            
+            let newIndex = currentStationIndex + 1;
+            if (newIndex >= radioStations.length) newIndex = 0;
+            selectStation(newIndex);
+        }
+
+        // Set volume
+        function setVolume() {
+            audio.volume = volumeControl.value;
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
